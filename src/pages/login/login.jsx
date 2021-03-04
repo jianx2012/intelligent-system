@@ -6,6 +6,7 @@ import './login.less'
 import memoryUtils from '../../utils/memoryUtils'
 import storageUtils from '../../utils/storageUtils'
 import Serv from '../../api'
+import { get } from 'store';
 class Login extends React.Component {
   constructor(props) {
     super(props);
@@ -17,6 +18,7 @@ class Login extends React.Component {
   componentDidMount() {
 
   }
+
   async onFinish(values){
     try {
       const result = await Serv.reqLogin(values.username,values.password)
@@ -32,16 +34,22 @@ class Login extends React.Component {
       }
       console.log('请求成功',result);
     } catch (error) {
-      console.log('请求失败');
+      console.log('请求失败',error);
     }
     console.log('Received values of form: ', values);
   };
   render() {
+      //判断是否已登录
+      const user =  memoryUtils.user
+      if(user && user._id){
+        // console.log(user);
+        return <Redirect to='/'/>
+      }
     return (
       <div className="login">
         <section className="login_content">
           <div className="login_topPart">
-            <h2>Welcome to Intelligent-System</h2>
+            <h2>Welcome to NTMBA-System</h2>
           </div>
           <div className="login_bottomPart">
             <div className="login_form">
@@ -52,7 +60,7 @@ class Login extends React.Component {
                 initialValues={{
                   remember: true,
                 }}
-                onFinish={this.onFinish}
+                onFinish={this.onFinish.bind(this)}
               >
                 <Form.Item
                 name="username"
