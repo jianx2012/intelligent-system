@@ -4,6 +4,9 @@ import Login from './pages/login/login'
 import Admin from './pages/admin/admin'
 import 'antd/dist/antd.less';
 export default class App extends Component{
+  componentWillUnmount(){
+    
+  }
   render(){
     return (
       <BrowserRouter>

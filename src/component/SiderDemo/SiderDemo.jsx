@@ -18,6 +18,7 @@ import User from "../../pages/user/user";
 import Category from "../../pages/category/category";
 import Product from "../../pages/product/product";
 import menuList from "../../config/menuConfig";
+import HeaderPart from "../Header/HeaderPart";
 const { Header, Content, Footer, Sider } = Layout;
 const { SubMenu } = Menu;
 
@@ -53,7 +54,7 @@ class SiderDemo extends React.Component {
   render() {
     const { collapsed } = this.state;
     let path = this.props.location.pathname
-    let optKey = '/asset'
+    let optKey = '/'
     menuList.map(item=>{
         if(item.children){
             item.children.map(cItem=>{
@@ -103,8 +104,10 @@ class SiderDemo extends React.Component {
           </Menu>
         </Sider>
         <Layout className="site-layout">
-          <Header className="site-layout-background" style={{ padding: 0 }} />
-          <Content style={{ margin: '0 16px' }}>
+          <Header className="site-layout-background" style={{ padding: 0 }}>
+            <HeaderPart/>
+          </Header>
+          <Content className='contentPart'>
               <Switch>
                   <Route path='/home' component={Home}/>
                   <Route path='/asset/role' component={Role}/>
@@ -113,13 +116,8 @@ class SiderDemo extends React.Component {
                   <Route path='/Product' component={Product}/>
                   <Redirect to='/home'/>
               </Switch>
-            {/* <Breadcrumb style={{ margin: '16px 0' }}>
-              <Breadcrumb.Item>User</Breadcrumb.Item>
-              <Breadcrumb.Item>Bill</Breadcrumb.Item>
-            </Breadcrumb>
-            <div className="site-layout-background" style={{ padding: 24, minHeight: 360 }}>
-              Bill is a cat.
-            </div> */}
+        
+
           </Content>
           <Footer style={{ textAlign: 'center' }}>NTMBA ©2021 Created by Zheng</Footer>
         </Layout>

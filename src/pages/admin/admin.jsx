@@ -2,8 +2,7 @@ import React from 'react';
 // import { Form } from 'antd';
 import {Redirect,Route,Switch} from 'react-router-dom'
 import memoryUtils from '../../utils/memoryUtils'
-import SiderDemo from '../../components/SiderDemo/SiderDemo'
-
+import SiderDemo from '../../component/SiderDemo/SiderDemo.jsx'
 import Home from "../home/home";
 import role from "../role/role";
 import user from "../user/user";
