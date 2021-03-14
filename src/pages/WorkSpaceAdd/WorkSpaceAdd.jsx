@@ -1,14 +1,14 @@
 import React from 'react';
-// import { Form } from 'antd';
 import { observer, inject } from 'mobx-react';
 import { withRouter } from 'react-router-dom';
-@inject("HomeMod")
+// import TableDemo from '../../component/Table/TableDemo'
+@inject("WorkSpaceAddMod")
 @withRouter
 @observer
-class Home extends React.Component {
+class WorkSpaceAdd extends React.Component {
   constructor (props) {
     super(props);
-    this.store = this.props.HomeMod;
+    this.store = this.props.WorkSpaceAddMod;
     this.state = {
   
     };
@@ -17,14 +17,16 @@ class Home extends React.Component {
   componentDidMount () {
   
     }
-    
+
+  componentWillMount(){ 
+  
+  }  
   render () {
-    let {a} = this.store.state
-    console.log(a);
+
     return (<div>
-            <i className='iconfont iconuser'></i> home
+         WorkSpaceAddaaa
     </div>);
   }
 }
 
-export default Home;
+export default WorkSpaceAdd;

@@ -33,8 +33,8 @@ const menuList = [
         icon: 'iconlayers',
     },
     {
-        title: '文件库',
-        key: '/product1',
+        title: '审批中心',
+        key: '/workspace',
         icon: 'iconfolder-close',
     },
 ]

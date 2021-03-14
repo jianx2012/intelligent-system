@@ -1,14 +1,8 @@
 import React from 'react';
 import {Link,Redirect,Route,Switch,withRouter} from 'react-router-dom'
-import { Layout, Menu, Breadcrumb } from 'antd';
+import { Layout, Menu, } from 'antd';
 import {
-  DesktopOutlined,
-  HomeOutlined,
-  FolderOutlined,
-  FileOutlined,
-  SoundOutlined,
   UserOutlined,
-  PartitionOutlined,
 } from '@ant-design/icons';
 import './SiderDemo.less' ;
 import logo from '../../assets/images/logo.png'
@@ -17,6 +11,7 @@ import Role from "../../pages/role/role";
 import User from "../../pages/user/user";
 import Category from "../../pages/category/category";
 import Product from "../../pages/product/product";
+import WorkSpaceHome from "../../pages/WorkSpace/WorkSpaceHome" 
 import menuList from "../../config/menuConfig";
 import HeaderPart from "../Header/HeaderPart";
 const { Header, Content, Footer, Sider } = Layout;
@@ -114,6 +109,7 @@ class SiderDemo extends React.Component {
                   <Route path='/asset/user' component={User}/>
                   <Route path='/Category' component={Category}/>
                   <Route path='/Product' component={Product}/>
+                  <Route path='/workspace' component={WorkSpaceHome}/>
                   <Redirect to='/home'/>
               </Switch>
         
