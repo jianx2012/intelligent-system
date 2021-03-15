@@ -73,6 +73,13 @@ class WorkSpaceMod {
             },
           ]
         }
+        ],
+        list:[
+          {
+            file1:'李云锋',
+            file2:22,
+            file2:'男'
+          }
         ]
     }
 
