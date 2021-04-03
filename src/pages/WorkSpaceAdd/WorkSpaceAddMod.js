@@ -5,9 +5,18 @@ import { observable, action, runInAction, autorun } from 'mobx';
 
 class WorkSpaceAddMod {
     @observable state = {
-      
+      formItem:{
+      },
+      formArray:[],
+      detailData:{}
     }
 
+    @action setValue = (key,value)=>{
+        this.state[key] = value;
+    }
+    @action clearState = () => {
+
+    }
 
 
 
