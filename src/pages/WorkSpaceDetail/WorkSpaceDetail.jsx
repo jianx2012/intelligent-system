@@ -1,7 +1,7 @@
 import React from 'react';
 import { observer, inject } from 'mobx-react';
 import { withRouter } from 'react-router-dom';
-import { Button, Card, Select, Input, Table, Drawer, Row, Col } from "antd";
+import { Button, Card, Select, Input, Table, Drawer, Row, Col, message } from "antd";
 import PageTitle from "../../component/PageTitle/PageTitleView";
 import FormConfig from "../../component/FormConfig/FormConfig";
 import Serv from '../../api'
@@ -29,6 +29,8 @@ class WorkSpaceDetail extends React.Component {
       data: {},
       id:'',
       approvalItem:{},
+      tableData:[],
+      itemListL:[],
     };
   }
 
@@ -37,7 +39,7 @@ class WorkSpaceDetail extends React.Component {
     path = new URLSearchParams(path.substring(1, this.props.location.length))
     const id = path.get('id');
     const result = await Serv.reqworkDetails(id)
-    console.log(result, 'result');
+
     if (result.status === 0) {
       let { data } = result
       data.formConfig.map((item, index) => {
@@ -55,23 +57,35 @@ class WorkSpaceDetail extends React.Component {
       let handle = [
         {
           title: '状态',
-          render:(record)=>(
-            <span>
-            进行中
-            </span>
-         )
+          render:(record)=>{
+            let state
+            if(record.state == 1){
+              state = '进行中'
+            }else if(record.state == 2){
+              state = '拒绝'
+            }else{
+              state = '同意'
+            }
+            return <span>{state}</span>
+          }
+           
+         
         },
         {
         title: '操作',
         fixed: 'right',
         width: 200,
-        render:(record)=>(
+        render:(text,record,index)=>{
+         
+          // record.state == 1&&
+          return [ record.state == 1?
           <span>
-            <a style={{marginRight:24}} onClick={()=>{}}>同意</a>
-            <a style={{marginRight:24}} onClick={()=>{}}>拒接</a>
-            {/* {this.state.parentId==0?<a onClick={()=>{}}>查看</a>:null} */}
-          </span>
-       )
+           <a style={{marginRight:24}} onClick={()=>{this.onApproval(index,3)}}>同意</a>
+           <a style={{marginRight:24}} onClick={()=>{this.onApproval(index,2)}}>拒绝</a>
+           {/* {this.state.parentId==0?<a onClick={()=>{}}>查看</a>:null} */}
+         </span>:<span style={{color:'#3c5b9a'}}>审批完成</span>]
+        }
+   
       }]
       columns = columns.concat(handle)
       console.log(columns,'columns');
@@ -82,15 +96,47 @@ class WorkSpaceDetail extends React.Component {
         id
       })
     }
+    await this.getItemList()
 
+
+ 
   }
 
-  componentWillMount() {
 
+  async getItemList(){
+    let id = this.state.id
+    const result1 = await Serv.reqAddapprovalList(id)
+    let tableData = []
+    if (result1.status === 0) {
+      let { data } = result1
+      data.map((item,index)=>{
+        // tableData.push(...item.itemlist)
+        let obj = Object.assign(...item.itemlist)
+        obj.key = index
+        obj.state = item.status
+        tableData.push(obj)
+      })
+      this.setState({tableData,itemList:data})
+    }
   }
   //修改审批表
   inputChange(key, value) {
     console.log('key=>', key, '    value=>>>', value);
+  }
+  async onApproval(index,type){
+    let itemList = this.state.itemList
+    console.log(itemList[index]);
+    let id = itemList[index]._id
+    let state = type
+    let params = {
+      id,state
+    }
+     const result = await Serv.reqUpdateStatus(params)
+     if(result.status == 0){
+       message.success('审批成功')
+       await this.getItemList()
+     }
+   console.log(result);
   }
   onSearch() {
 
@@ -113,7 +159,7 @@ class WorkSpaceDetail extends React.Component {
   onShowAdd = () => {
     this.setState({ showDrawer: true })
   }
-  onHandleAdd = () => {
+  onHandleAdd = async() => {
     const username =  memoryUtils.user.username
     let {approvalItem,data,} = this.state
     let itemlist = []
@@ -129,16 +175,19 @@ class WorkSpaceDetail extends React.Component {
       creator : username,
       itemlist
     }
-    console.log(params);
+    const result = await Serv.reqAddapproval(params)
+    console.log(result,'result');
+    if(result.status == 0){
+      await this.getItemList()
+      this.onClose()
+    }
   }
 
   render() {
-    let { columns, showDrawer, formConfig = [], data } = this.state
+    let { columns, showDrawer, formConfig = [], data ,tableData} = this.state
     let { queryList, loading } = this.store.state;
     queryList = cloneDeep(queryList)
     let formList = formConfig.formConfig
-    console.log(formList, 'formList');
-    let tableData = []
     const extra = (
       <Button type="primary" onClick={() => this.onShowAdd()}>
         <PlusOutlined /> 新增
@@ -171,7 +220,7 @@ class WorkSpaceDetail extends React.Component {
     return (<div>
       <Card title={title} extra={extra} bordered={false}>
         <PageTitle title={data.title}></PageTitle>
-        <Table columns={columns} tableData={tableData}>
+        <Table columns={columns} dataSource={tableData}>
         </Table>
       </Card>
 

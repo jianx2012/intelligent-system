@@ -34,12 +34,12 @@ export default {
     搜索商品分页列表 (根据商品名称/商品描述)
     searchType: 搜索的类型, productName/productDesc
     */
-    reqSearchProducts({ pageNum, pageSize, searchName, searchType }){
+    reqSearchProducts({ pageNum, pageSize, searchName, searchType }) {
         return ajax(BASE + '/manage/product/search', {
-        pageNum,
-        pageSize,
-        [searchType]: searchName,
-    })
+            pageNum,
+            pageSize,
+            [searchType]: searchName,
+        })
     },
     // 更新商品的状态(上架/下架)
     reqUpdateStatus(productId, status) {
@@ -50,13 +50,13 @@ export default {
 
 
     //添加审批表单
-    reqAddwork(params){
-        return ajax(BASE + '/manage/workspeace/add', {workspeace:params}, 'POST')
+    reqAddwork(params) {
+        return ajax(BASE + '/manage/workspeace/add', { workspeace: params }, 'POST')
     },
 
     // 获取商品分页列表
     reqworkList() {
-        return ajax(BASE + '/manage/workspeace/list', { pageNum:1, pageSize:10 })
+        return ajax(BASE + '/manage/workspeace/list', { pageNum: 1, pageSize: 10 })
     },
 
     //获取分类的列表
@@ -65,9 +65,16 @@ export default {
     },
 
     //添加审批项目
-    reqAddapproval(params){
-        return ajax(BASE + '/manage/approval/add', {approval:params}, 'POST')
+    reqAddapproval(params) {
+        return ajax(BASE + '/manage/approval/add', { approval: params }, 'POST')
     },
-
+    //查询审批项列表
+    reqAddapprovalList(id) {
+        return ajax(BASE + '/manage/approval/details', { id })
+    },
+    // 更新审批项的状态
+    reqUpdateStatus(params) {
+        return ajax(BASE + '/manage/approval/update', { ...params }, 'POST')
+    },
 
 }
