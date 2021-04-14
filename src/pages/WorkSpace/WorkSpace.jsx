@@ -6,6 +6,7 @@ import {
 import PageTitle from "../../component/PageTitle/PageTitleView";
 import { observer, inject } from 'mobx-react';
 import { withRouter } from 'react-router-dom';
+import Serv from '../../api'
 // import TableDemo from '../../component/Table/TableDemo'
 const { Option } = Select;
 @inject("WorkSpaceMod")
@@ -16,18 +17,24 @@ class Home extends React.Component {
     super(props);
     this.store = this.props.WorkSpaceMod;
     this.state = {
-  
+      approvallist:[]
     };
   }
   
-  componentDidMount () {
-  
+   componentDidMount () {
+    const result =  Serv.reqworkList()
+    result.then((value)=>{
+      let approvallist = value.data.list
+      this.setState({approvallist})
+    })
+
+   
     }
     intColumns = () => {
       this.columns = [
         {
           title: '审批表',
-          dataIndex: 'name',
+          dataIndex: 'title',
   
         },
         {
@@ -56,10 +63,11 @@ class Home extends React.Component {
       this.props.history.push('/workspace/workadd')
     }
   render () {
-    let {obj} = this.store.state
+    // let {approvallist,pageInfo} = this.store.state
+    let {approvallist} = this.state
     // let title = '审批中心'
-    let dataSource = obj || []
-
+    let dataSource = approvallist || []
+    console.log(approvallist,'approvallist');
     const extra = (
       <Button type="primary" onClick={()=>this.onHandleAdd()}>
         <PlusOutlined /> 新增

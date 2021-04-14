@@ -44,5 +44,30 @@ export default {
     // 更新商品的状态(上架/下架)
     reqUpdateStatus(productId, status) {
         return ajax(BASE + '/manage/product/updateStatus', { productId, status }, 'POST')
-    }
+    },
+
+
+
+
+    //添加审批表单
+    reqAddwork(params){
+        return ajax(BASE + '/manage/workspeace/add', {workspeace:params}, 'POST')
+    },
+
+    // 获取商品分页列表
+    reqworkList() {
+        return ajax(BASE + '/manage/workspeace/list', { pageNum:1, pageSize:10 })
+    },
+
+    //获取分类的列表
+    reqworkDetails(id) {
+        return ajax(BASE + '/manage/workspeace/details', { id })
+    },
+
+    //添加审批项目
+    reqAddapproval(params){
+        return ajax(BASE + '/manage/approval/add', {approval:params}, 'POST')
+    },
+
+
 }

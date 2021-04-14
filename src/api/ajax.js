@@ -1,6 +1,5 @@
 import axios from "axios";
 import {message} from 'antd';
-
 export default function ajax(url, data={},type='GET'){
     //执行异步ajax请求
     return new Promise((resolve,reject)=>{

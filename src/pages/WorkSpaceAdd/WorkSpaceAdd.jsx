@@ -3,7 +3,10 @@ import { observer, inject } from 'mobx-react';
 import { withRouter } from 'react-router-dom';
 import PageTitle from "../../component/PageTitle/PageTitleView";
 import FormConfig from "../../component/FormConfig/FormConfig";
-import { Divider ,Form, Input,Row } from 'antd';
+import { Button, Divider, Form, Input, Row, Table, Modal,Col, message } from 'antd';
+import Serv from '../../api'
+// import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
+import { isEmpty,cloneDeep } from "lodash";
 const layout = {
   labelCol: { span: 8 },
   wrapperCol: { span: 16 },
@@ -11,72 +14,240 @@ const layout = {
 const tailLayout = {
   wrapperCol: { offset: 8, span: 16 },
 };
+const formItemLayout = {
+  labelCol: {
+    xs: { span: 24 },
+    sm: { span: 4 },
+  },
+  wrapperCol: {
+    xs: { span: 24 },
+    sm: { span: 20 },
+  },
+};
+const formItemLayoutWithOutLabel = {
+  wrapperCol: {
+    xs: { span: 24, offset: 0 },
+    sm: { span: 20, offset: 4 },
+  },
+};
+
+
+
 @inject("WorkSpaceAddMod")
 @withRouter
 @observer
 class WorkSpaceAdd extends React.Component {
   formRef = React.createRef();
-  constructor (props) {
+  constructor(props) {
     super(props);
     this.store = this.props.WorkSpaceAddMod;
     this.state = {
-  
+      options: [],
+      showmodal: false,
+      formItem: {},
+      optItem: {},
+      tableConfig: {},
     };
   }
-  
-  componentDidMount () {
-  
-    }
 
-  componentWillMount(){ 
-  
-  }  
-  inputChange(key,value){
+  componentDidMount() {
+
+  }
+
+
+
+  //修改审批表
+  inputChange(key, value) {
+    let tableConfig = this.state.tableConfig
+    tableConfig[key] = value
+    console.log(tableConfig, 'formItem');
+    this.setState({ tableConfig })
+  }
+
+  //修改表单配置
+  inputChangeConfig(key, value) {
+    console.log("baseInfo key:", key, "value:", value)
+    let formItem = this.state.formItem
+    formItem[key] = value
+    console.log(formItem, 'formItem');
+    this.setState({ formItem })
+  }
+
+  //表单新增选项
+  addOption(key, value) {
+    let optItem = this.state.optItem
+    optItem[key] = value
+    this.setState({ optItem })
+    console.log(optItem);
     console.log("baseInfo key:", key, "value:", value)
   }
-  render () {
+
+  onFinish = values => {
+    console.log('Received values of form:', values);
+    // console.log(fields,'fields');
+  }
+
+  //增加选项
+  onAddOptions() {
+    let { options } = this.state;
+    options.push(this.id++);
+    this.setState({ options });
+  }
+
+  //表单新增确认
+  onConfirm = () => {
+    const p = this.formRef.current.validateFields()
+    p.then((value) => {
+      let formItem = this.state.formItem
+      let formArray = this.store.state.formArray
+      formArray.push(formItem)
+      this.store.setValue('formArray', formArray)
+  
+      this.formRef.current.resetFields()
+      this.setState({ formItem: {}, showmodal: false })
+     
+      // console.log(this.formRef,'formRef');
+    }).catch((err) => {
+      console.log(err);
+    })
+
+  }
+
+  //提交
+  onSubmit = () => {
+    const p = this.formRef.current.validateFields()
+    p.then((value) => {
+      let tableConfig = this.state.tableConfig
+      let formArray = this.store.state.formArray || []
+      if(!formArray.length){
+        message.warn('请配置表单')
+        return false
+      }else{
+        tableConfig.formConfig = formArray
+        let detailData = tableConfig
+        const result = Serv.reqAddwork(detailData)
+          this.props.history.push('/workspace')
+
+      }
+    }
+    )
+  }
+  onCancel = () => {
+    this.formRef.current.resetFields()
+    this.setState({ showmodal: false })
+  }
+  render() {
     //表单配置
+    let { options, showmodal, formItem } = this.state
+    let { formArray } = this.store.state
+    let isOption = false
+    if (formItem.type == 'radio' || formItem.type == 'select' || formItem.type == 'checkbox') {
+      isOption = true
+    }
+    console.log(formArray, 'formArray');
+
     const formConfigObj = {
-      form:this.formRef,
-      formConfig:[
-        {title:'审批表名称',type:'input',key:'title',required:true}
+      form: this.formRef,
+      formConfig: [
+        { title: '审批表名称', type: 'input', key: 'title', required: true },
+        { title: '审批表描述', type: 'textarea', key: 'desc', required: true },
       ],
-      callback:this.inputChange.bind(this)
+      callback: this.inputChange.bind(this)
     }
-    let callback = formConfigObj.callback
-    // console.log(callback,'callback');
-    const content = (item,index)=>{
-      return <div>
-        {[
-          item.type === 'input' && <Input 
-          onChange={e => callback(item.key, e.target.value)}
-          />
-        ]}
-      </div>
+    const formConfig = {
+      form: this.formRef,
+      formConfig: [
+        { title: '标题', type: 'input', key: 'title', required: true },
+        { title: '描述', type: 'textarea', key: 'desc', required: true },
+        {
+          title: '是否必填', type: 'radio', key: 'required', required: true,
+          list: [{ label: '是', value: 1 }, { label: '否', value: 2 }]
+        },
+        {
+          title: '表单类型', type: 'select', key: 'type', required: true,
+          list: [
+            { label: '输入框', value: 'input' },
+            { label: '文本域', value: 'textarea' },
+            { label: '数字输入框', value: 'inputNumber' },
+            { label: '单选框', value: 'radio' },
+            { label: '复选框', value: 'checkbox' },
+            { label: '下拉框', value: 'select' },
+            { label: '日期选择框', value: 'datePicker' },
+            { label: '时间范围选择框', value: 'RangePicker' },
+          ]
+        }
+      ],
+      callback: this.inputChangeConfig.bind(this)
     }
+
+    const columns = [
+      {
+        title: '标题',
+        dataIndex: 'title',
+        key: 'title',
+      },
+      {
+        title: '类型',
+        dataIndex: 'type',
+        key: 'type',
+      },
+      {
+        title: '是否必填',
+        dataIndex: 'required',
+        key: 'required',
+      },
+    ];
+    let dataSource = cloneDeep(formArray)
+
     return (<div>
-         <PageTitle title='审批基本信息'></PageTitle>
-         <Divider />
-         <Row>
-          <FormConfig {...formConfigObj}>
+      <PageTitle title='审批基本信息' rightContent={  <Button type='primary' onClick={() => { this.onSubmit() }}>发布</Button>}></PageTitle>
 
-          </FormConfig>
-         <Form
-      {...layout}
-      name="basic"
-    >
-      {formConfigObj.formConfig.map((item,index)=>
-      <Form.Item
-      label={item.title}
-      name={item.key}
-      rules={[{ required: item.required, message:`请输入${item.title}` }]}
-    >
-      {content(item, index)}
-    </Form.Item>
-      )}
+      <Divider />
+      <Row>
+        <Col>
+        <FormConfig {...formConfigObj} />
+        </Col>
+      </Row>
+      <Row>
+        <Form.Item
+          label={'配置表单'}
+          name={'config'}
+          rules={[{ required: true, message: `请配置表单` }]}
+        >
+          <Button type='primary' onClick={() => { this.setState({ showmodal: true }) }}>配置</Button>
+        </Form.Item>
+      </Row>
+      <Row>
+        <Table dataSource={dataSource} columns={columns} style={{ width: 900 }} pagination={false}></Table>
+      </Row>
 
-    </Form>
-    </Row>
+      <Modal
+        title="配置表单"
+        cancelText='取消'
+        okText='确定'
+        visible={showmodal}
+        onOk={() => { this.onConfirm() }}
+        onCancel={() => { this.onCancel() }}>
+        <FormConfig {...formConfig} />
+        {isOption && <div>
+          <Divider />
+          {options.map((item, index) =>
+            <Form.Item
+              label={`选项${index + 1}`}
+              name={`option_${index}`}
+              key={index}
+              rules={[{ required: true, message: `请输入选项` }]}
+            >
+              <Input style={{ width: 200 }} key={index} onChange={e => this.addOption(`option_${index}`, e.target.value)} />
+            </Form.Item>
+          )}
+
+          <Button
+            type="primary"
+            onClick={this.onAddOptions.bind(this)}
+          >新增选项</Button>
+        </div>}
+      </Modal>
     </div>);
   }
 }
