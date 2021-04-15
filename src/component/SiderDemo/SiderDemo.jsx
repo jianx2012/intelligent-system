@@ -10,6 +10,9 @@ import Home from "../../pages/home/home";
 import Role from "../../pages/role/role";
 import User from "../../pages/user/user";
 import Category from "../../pages/category/category";
+import Announcement from "../../pages/announcement/announcement";
+import AnnouncementAdd from "../../pages/announcement/announcementAdd";
+import AnnouncementDetail from "../../pages/announcement/announcementDetail";
 import Product from "../../pages/product/product";
 import WorkSpaceHome from "../../pages/WorkSpace/WorkSpaceHome" 
 import menuList from "../../config/menuConfig";
@@ -108,6 +111,9 @@ class SiderDemo extends React.Component {
                   <Route path='/asset/role' component={Role}/>
                   <Route path='/asset/user' component={User}/>
                   <Route path='/Category' component={Category}/>
+                  <Route path='/Announcement' component={Announcement}/>
+                  <Route path='/announcementdetail' component={AnnouncementDetail}/>
+                  <Route path='/announcementadd' component={AnnouncementAdd}/>
                   <Route path='/Product' component={Product}/>
                   <Route path='/workspace' component={WorkSpaceHome}/>
                   <Redirect to='/home'/>

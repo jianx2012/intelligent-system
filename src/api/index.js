@@ -54,12 +54,12 @@ export default {
         return ajax(BASE + '/manage/workspeace/add', { workspeace: params }, 'POST')
     },
 
-    // 获取商品分页列表
+    // 获取审批中心分页列表
     reqworkList() {
         return ajax(BASE + '/manage/workspeace/list', { pageNum: 1, pageSize: 10 })
     },
 
-    //获取分类的列表
+    //获取审批详情
     reqworkDetails(id) {
         return ajax(BASE + '/manage/workspeace/details', { id })
     },
@@ -69,12 +69,31 @@ export default {
         return ajax(BASE + '/manage/approval/add', { approval: params }, 'POST')
     },
     //查询审批项列表
-    reqAddapprovalList(id) {
+    reqApprovalList(id) {
         return ajax(BASE + '/manage/approval/details', { id })
     },
     // 更新审批项的状态
     reqUpdateStatus(params) {
         return ajax(BASE + '/manage/approval/update', { ...params }, 'POST')
     },
-
+    // 查询
+    reqSearchWork({ pageNum, pageSize, searchName, searchType }) {
+        return ajax(BASE + '/manage/workspeace/search', {
+            pageNum,
+            pageSize,
+            [searchType]: searchName,
+        })
+    },
+    //新增公告
+    reqAddAnnouncement(params) {
+        return ajax(BASE + '/manage/announcement/add', { params }, 'POST')
+    },
+    //查询公告列表
+    reqAnnouncementList() {
+        return ajax(BASE + '/manage/announcement/list', { pageNum: 1, pageSize: 10 })
+    },
+    //获取公告详情
+    reqAnnouncementDetails(id) {
+        return ajax(BASE + '/manage/announcement/details', { id })
+    },
 }

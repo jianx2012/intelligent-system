@@ -24,7 +24,7 @@ const menuList = [
     },
     {
         title: '公告',
-        key: '/category',
+        key: '/announcement',
         icon: 'iconsound'
     },
     {

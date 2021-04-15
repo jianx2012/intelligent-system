@@ -39,7 +39,6 @@ class WorkSpaceDetail extends React.Component {
     path = new URLSearchParams(path.substring(1, this.props.location.length))
     const id = path.get('id');
     const result = await Serv.reqworkDetails(id)
-
     if (result.status === 0) {
       let { data } = result
       data.formConfig.map((item, index) => {
@@ -105,7 +104,7 @@ class WorkSpaceDetail extends React.Component {
 
   async getItemList(){
     let id = this.state.id
-    const result1 = await Serv.reqAddapprovalList(id)
+    const result1 = await Serv.reqApprovalList(id)
     let tableData = []
     if (result1.status === 0) {
       let { data } = result1
@@ -186,6 +185,11 @@ class WorkSpaceDetail extends React.Component {
   render() {
     let { columns, showDrawer, formConfig = [], data ,tableData} = this.state
     let { queryList, loading } = this.store.state;
+    let pageConfig = {
+      current:1,
+      total:50,
+      pageSize:10,
+    }
     queryList = cloneDeep(queryList)
     let formList = formConfig.formConfig
     const extra = (
@@ -220,7 +224,7 @@ class WorkSpaceDetail extends React.Component {
     return (<div>
       <Card title={title} extra={extra} bordered={false}>
         <PageTitle title={data.title}></PageTitle>
-        <Table columns={columns} dataSource={tableData}>
+        <Table columns={columns} dataSource={tableData} pagination={false}>
         </Table>
       </Card>
 
@@ -256,7 +260,7 @@ class WorkSpaceDetail extends React.Component {
         </Row>
 
       </Drawer>
-    </div>);
+    </div>)
   }
 }
 

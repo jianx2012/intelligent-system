@@ -17,19 +17,38 @@ class Home extends React.Component {
     super(props);
     this.store = this.props.WorkSpaceMod;
     this.state = {
-      approvallist:[]
+      approvallist:[],
+      searchName:'',
+      searchType:'title',
+      loading:false
+
     };
   }
   
    componentDidMount () {
-    const result =  Serv.reqworkList()
-    result.then((value)=>{
-      let approvallist = value.data.list
-      this.setState({approvallist})
-    })
+    this.setState({loading:true})
+    this.getList()
+   }
+   getList = async() =>{
 
-   
+    const result = await Serv.reqworkList()
+    if(result.status == 0){
+      let approvallist = result.data.list
+      this.setState({approvallist,loading:false})
+    }else{
+      this.setState({loading:false})
     }
+
+  }
+  onSearch = async() =>{
+    let {searchType,searchName} = this.state
+    console.log(searchType,searchName);
+    const result = await Serv.reqSearchWork({pageNum:1,pageSize:10,searchType,searchName})
+    if(result.status == 0){
+      let approvallist = result.data.list
+      this.setState({approvallist})
+    }
+  }
     intColumns = () => {
       this.columns = [
         {
@@ -64,7 +83,8 @@ class Home extends React.Component {
     }
   render () {
     // let {approvallist,pageInfo} = this.store.state
-    let {approvallist} = this.state
+
+    let {approvallist,searchName,loading} = this.state
     // let title = '审批中心'
     let dataSource = approvallist || []
     console.log(approvallist,'approvallist');
@@ -75,31 +95,31 @@ class Home extends React.Component {
     )
     const title = (
       <span>
-        <Select defaultValue={'productName'} style={{width:150}}
-        //  onChange={(value)=>{
-        //     this.setState({searchType:value})
-        // }}
+        <Select defaultValue={'title'} style={{width:150}}
+         onChange={(value)=>{
+            this.setState({searchType:value})
+        }}
         >
-          <Option value='productName'>按名称搜索</Option>
-          <Option value='productDesc'>按描述搜索</Option>
+          <Option value='title'>按名称搜索</Option>
+          <Option value='desc'>按描述搜索</Option>
         </Select>
         <Input placeholder='输入关键字搜索' bordered={true} style={{width:250,margin:'0 15px'}}
-      //    value={searchName}
-      //    onChange={(e)=>{
-      //     this.setState({searchName:e.target.value})
-      // }}
+         value={searchName}
+         onChange={(e)=>{
+          this.setState({searchName:e.target.value})
+      }}
         ></Input>
         <Button type='primary'
-          onClick={()=>{this.getProducts(1)}}
+          onClick={()=>{this.onSearch()}}
         >搜索</Button>
       </span>
     )
     return (<div>
          <Card title={title} extra={extra} bordered={false}>
             <PageTitle title='审批中心'></PageTitle>
-            <Table dataSource={dataSource} columns={this.columns} rowKey='_id'/>;
+            <Table dataSource={dataSource} columns={this.columns}  loading={loading} rowKey='_id'/>
          </Card>
-    </div>);
+    </div>)
   }
 }
 

@@ -77,6 +77,10 @@ class WorkSpaceAdd extends React.Component {
   addOption(key, value) {
     let optItem = this.state.optItem
     optItem[key] = value
+    // for (let key in optItem) {
+    //     console.log(key);
+    //   }
+    
     this.setState({ optItem })
     console.log(optItem);
     console.log("baseInfo key:", key, "value:", value)
@@ -100,11 +104,25 @@ class WorkSpaceAdd extends React.Component {
     p.then((value) => {
       let formItem = this.state.formItem
       let formArray = this.store.state.formArray
+      if (formItem.type == 'radio' || formItem.type == 'select' || formItem.type == 'checkbox') {
+        let { optItem } = this.state;
+        let list = []
+        let index = 0
+        for (let i in optItem) {
+          let o = {};
+          o.label = optItem[i];
+          o.value = index
+          index++
+          list.push(o)
+        }
+        formItem.list = list
+        console.log(list,'list');
+      }
+      console.log(formItem,'formItem');
       formArray.push(formItem)
       this.store.setValue('formArray', formArray)
-  
       this.formRef.current.resetFields()
-      this.setState({ formItem: {}, showmodal: false })
+      this.setState({ formItem: {}, showmodal: false,optItem:{}, })
      
       // console.log(this.formRef,'formRef');
     }).catch((err) => {
@@ -116,7 +134,7 @@ class WorkSpaceAdd extends React.Component {
   //提交
   onSubmit = () => {
     const p = this.formRef.current.validateFields()
-    p.then((value) => {
+    p.then(async(value) => {
       let tableConfig = this.state.tableConfig
       let formArray = this.store.state.formArray || []
       if(!formArray.length){
@@ -125,9 +143,11 @@ class WorkSpaceAdd extends React.Component {
       }else{
         tableConfig.formConfig = formArray
         let detailData = tableConfig
-        const result = Serv.reqAddwork(detailData)
+        const result = await Serv.reqAddwork(detailData)
           this.props.history.push('/workspace')
-
+          if(result.status == 0){
+            this.store.setValue('formArray',[])
+          }
       }
     }
     )
