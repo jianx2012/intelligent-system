@@ -15,6 +15,8 @@ import AnnouncementAdd from "../../pages/announcement/announcementAdd";
 import AnnouncementDetail from "../../pages/announcement/announcementDetail";
 import Product from "../../pages/product/product";
 import WorkSpaceHome from "../../pages/WorkSpace/WorkSpaceHome" 
+import ListPageHome from "../../pages/ListPage/ListPageHome" 
+
 import menuList from "../../config/menuConfig";
 import HeaderPart from "../Header/HeaderPart";
 const { Header, Content, Footer, Sider } = Layout;
@@ -116,6 +118,7 @@ class SiderDemo extends React.Component {
                   <Route path='/announcementadd' component={AnnouncementAdd}/>
                   <Route path='/Product' component={Product}/>
                   <Route path='/workspace' component={WorkSpaceHome}/>
+                  <Route path='/listpage' component={ListPageHome}/>
                   <Redirect to='/home'/>
               </Switch>
         

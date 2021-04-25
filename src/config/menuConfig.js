@@ -29,7 +29,7 @@ const menuList = [
     },
     {
         title: '列表库',
-        key: '/product',
+        key: '/listpage',
         icon: 'iconlayers',
     },
     {

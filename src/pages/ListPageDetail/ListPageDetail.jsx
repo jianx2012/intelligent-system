@@ -14,14 +14,14 @@ import {
   PlusOutlined,
 } from '@ant-design/icons';
 const { Option } = Select;
-@inject("WorkSpaceDetailMod")
+@inject("ListPageDetailMod")
 @withRouter
 @observer
-class WorkSpaceDetail extends React.Component {
+class ListPageDetail extends React.Component {
   formRef = React.createRef();
   constructor(props) {
     super(props);
-    this.store = this.props.WorkSpaceDetailMod;
+    this.store = this.props.ListPageDetailMod;
     this.state = {
       columns: [],
       showDrawer: false,
@@ -38,7 +38,7 @@ class WorkSpaceDetail extends React.Component {
     let path = this.props.location.search
     path = new URLSearchParams(path.substring(1, this.props.location.length))
     const id = path.get('id');
-    const result = await Serv.reqworkDetails(id)
+    const result = await Serv.reqlistPageDetails(id)
     if (result.status === 0) {
       let { data } = result
       data.formConfig.map((item, index) => {
@@ -79,8 +79,8 @@ class WorkSpaceDetail extends React.Component {
           // record.state == 1&&
           return [ record.state == 1?
           <span>
-           <a style={{marginRight:24}} onClick={()=>{this.onApproval(index,3)}}>查看</a>
-           <a style={{marginRight:24}} onClick={()=>{this.onApproval(index,2)}}>编辑</a>
+           <a style={{marginRight:24}} onClick={()=>{this.onApproval(index,3)}}>同意</a>
+           <a style={{marginRight:24}} onClick={()=>{this.onApproval(index,2)}}>拒绝</a>
            {/* {this.state.parentId==0?<a onClick={()=>{}}>查看</a>:null} */}
          </span>:<span style={{color:'#3c5b9a'}}>审批完成</span>]
         }
@@ -264,4 +264,4 @@ class WorkSpaceDetail extends React.Component {
   }
 }
 
-export default WorkSpaceDetail;
+export default ListPageDetail;

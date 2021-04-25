@@ -64,6 +64,23 @@ export default {
         return ajax(BASE + '/manage/workspeace/details', { id })
     },
 
+
+    //添加列表表单
+    reqAddlistPage(params) {
+        return ajax(BASE + '/manage/listPage/add', { workspeace: params }, 'POST')
+    },
+
+    // 获取列表
+    reqlistPage() {
+        return ajax(BASE + '/manage/listPage/list', { pageNum: 1, pageSize: 10 })
+    },
+
+    //获取列表详情
+    reqlistPageDetails(id) {
+        return ajax(BASE + '/manage/listPage/details', { id })
+    },
+
+
     //添加审批项目
     reqAddapproval(params) {
         return ajax(BASE + '/manage/approval/add', { approval: params }, 'POST')
@@ -84,6 +101,14 @@ export default {
             [searchType]: searchName,
         })
     },
+    // 查询
+    reqSearchList({ pageNum, pageSize, searchName, searchType }) {
+        return ajax(BASE + '/manage/listPage/search', {
+            pageNum,
+            pageSize,
+            [searchType]: searchName,
+        })
+    },
     //新增公告
     reqAddAnnouncement(params) {
         return ajax(BASE + '/manage/announcement/add', { params }, 'POST')
@@ -95,6 +120,14 @@ export default {
     //获取公告详情
     reqAnnouncementDetails(id) {
         return ajax(BASE + '/manage/announcement/details', { id })
+    },
+    // 更新公告的状态
+    reqUpdateAnnounce(params) {
+        return ajax(BASE + '/manage/announcement/update', { ...params }, 'POST')
+    },
+    // 删除公告的状态
+    reqDeleteAnnounce(params) {
+        return ajax(BASE + '/manage/announcement/delete', { ...params }, 'POST')
     },
     // 获取所有角色的列表
     reqRoles() {
@@ -110,7 +143,7 @@ export default {
     },
     // 删除指定用户
     reqDeleteUser(userId) {
-        return ajax(BASE + '/manage/user/delete', { userId },'POST')
+        return ajax(BASE + '/manage/user/delete', { userId }, 'POST')
     },
     //添加用户
     reqAddUser(user) {
