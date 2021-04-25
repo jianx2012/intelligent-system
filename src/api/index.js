@@ -96,4 +96,28 @@ export default {
     reqAnnouncementDetails(id) {
         return ajax(BASE + '/manage/announcement/details', { id })
     },
+    // 获取所有角色的列表
+    reqRoles() {
+        return ajax(BASE + '/manage/role/list')
+    },
+    // 添加角色
+    reqAddRole(roleName) {
+        return ajax(BASE + '/manage/role/add', { roleName }, 'POST')
+    },
+    // 获取所有用户的列表
+    reqUsers() {
+        return ajax(BASE + '/manage/user/list')
+    },
+    // 删除指定用户
+    reqDeleteUser(userId) {
+        return ajax(BASE + '/manage/user/delete', { userId },'POST')
+    },
+    //添加用户
+    reqAddUser(user) {
+        return ajax(BASE + '/manage/user/add', user, 'POST')
+    },
+    //编辑用户
+    reqUpdateUser(user) {
+        return ajax(BASE + '/manage/user/update', user, 'POST')
+    },
 }
