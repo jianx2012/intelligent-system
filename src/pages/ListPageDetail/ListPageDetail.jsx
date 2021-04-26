@@ -54,37 +54,29 @@ class ListPageDetail extends React.Component {
       }
       
       let handle = [
-        {
-          title: '状态',
-          render:(record)=>{
-            let state
-            if(record.state == 1){
-              state = '进行中'
-            }else if(record.state == 2){
-              state = '拒绝'
-            }else{
-              state = '同意'
-            }
-            return <span>{state}</span>
-          }
+        // {
+        //   title: '状态',
+        //   render:(record)=>{
+        //     let state
+        //     if(record.state == 1){
+        //       state = '进行中'
+        //     }else if(record.state == 2){
+        //       state = '拒绝'
+        //     }else{
+        //       state = '同意'
+        //     }
+        //     return <span>{state}</span>
+        //   }
            
          
-        },
+        // }
+        
         {
         title: '操作',
         fixed: 'right',
         width: 200,
-        render:(text,record,index)=>{
-         
-          // record.state == 1&&
-          return [ record.state == 1?
-          <span>
-           <a style={{marginRight:24}} onClick={()=>{this.onApproval(index,3)}}>同意</a>
-           <a style={{marginRight:24}} onClick={()=>{this.onApproval(index,2)}}>拒绝</a>
-           {/* {this.state.parentId==0?<a onClick={()=>{}}>查看</a>:null} */}
-         </span>:<span style={{color:'#3c5b9a'}}>审批完成</span>]
-        }
-   
+        render:(text,record,index)=>
+           <a style={{marginRight:24}} onClick={()=>{this.onApproval(index,3)}}>编辑</a>
       }]
       columns = columns.concat(handle)
       console.log(columns,'columns');
