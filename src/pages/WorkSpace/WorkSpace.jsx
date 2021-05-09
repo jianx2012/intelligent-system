@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import React from 'react';
 import { Card,Table,Button,Select,Input } from 'antd';
 import {
@@ -7,6 +8,7 @@ import PageTitle from "../../component/PageTitle/PageTitleView";
 import { observer, inject } from 'mobx-react';
 import { withRouter } from 'react-router-dom';
 import Serv from '../../api'
+import storageUtils from "../../utils/storageUtils";
 // import TableDemo from '../../component/Table/TableDemo'
 const { Option } = Select;
 @inject("WorkSpaceMod")
@@ -50,6 +52,7 @@ class Home extends React.Component {
     }
   }
     intColumns = () => {
+      let userInfo = storageUtils.getUser()
       this.columns = [
         {
           title: '审批表',
@@ -66,7 +69,11 @@ class Home extends React.Component {
           // dataIndex: 'status',
           render:(record) =>{
             return <span>
-              <a style={{marginRight:10}}>编辑</a> <a onClick={()=>{
+              
+              {userInfo.role=='管理员'&&<a style={{marginRight:10}}
+              onClick={()=>{ this.props.history.push(`/workspace/workadd?id=${record._id}`)}}
+              >编辑</a>}
+               <a onClick={()=>{
                  this.props.history.push(`/workspace/workdetail?id=${record._id}`)
               }}>查看</a>
             </span>
@@ -83,7 +90,7 @@ class Home extends React.Component {
     }
   render () {
     // let {approvallist,pageInfo} = this.store.state
-
+    let userInfo = storageUtils.getUser()
     let {approvallist,searchName,loading} = this.state
     // let title = '审批中心'
     let dataSource = approvallist || []
@@ -115,7 +122,7 @@ class Home extends React.Component {
       </span>
     )
     return (<div>
-         <Card title={title} extra={extra} bordered={false}>
+         <Card title={title} extra={userInfo.role=='管理员'?extra:undefined} bordered={false}>
             <PageTitle title='审批中心'></PageTitle>
             <Table dataSource={dataSource} columns={this.columns}  loading={loading} rowKey='_id'/>
          </Card>

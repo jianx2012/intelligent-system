@@ -1,8 +1,8 @@
 import React from 'react';
 import { Form, Input, Row,Col, Radio,Select,Checkbox,DatePicker,InputNumber } from 'antd';
 const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
+  labelCol: { span: 10 },
+  wrapperCol: { span: 14 },
 };
 const tailLayout = {
   wrapperCol: { offset: 8, span: 16 },
@@ -40,8 +40,8 @@ class FormConfig extends React.Component {
             name={item.key}
             rules={[{ required: item.required, message: `请输入${item.title}` }]}
           >
-            <Input
-              onChange={e => callback(item.key, e.target.value)}
+            <Input autoComplete='off'
+              onChange={e => callback(item.key, e.target.value , item.type)}
             />
           </Form.Item>,
           // 文本域
@@ -52,7 +52,7 @@ class FormConfig extends React.Component {
             name={item.key}
             rules={[{ required: item.required, message: `请输入${item.title}` }]}
           >
-            <TextArea onChange={e => callback(item.key, e.target.value)} />
+            <TextArea onChange={e => callback(item.key, e.target.value,item.type)} />
           </Form.Item>,
 
           // 单选框
@@ -66,7 +66,7 @@ class FormConfig extends React.Component {
             <Radio.Group
               name={item.key}
               disabled={item.disabled || false}
-              onChange={e => callback(item.key, e.target.value)}
+              onChange={e => callback(item.key, e.target.value,item.type,item.list)}
               {...item.options}
             >
               {item.list.map(data => <Radio key={data.value} value={data.value} {...data.options}>{data.label}</Radio>)}
@@ -85,7 +85,7 @@ class FormConfig extends React.Component {
               // getPopupContainer={() => document.getElementById(dealWithCoverSelectId)}
               placeholder={`请选择${item.title}`}
               disabled={item.disabled || false}
-              onSelect={(value, option) => callback(item.key, value, option)}
+              onSelect={(value, option) => callback(item.key, value,item.type,item.list)}
               {...item.options}
             >
               {item.list.map((data,index)=> <Select.Option
@@ -110,7 +110,7 @@ class FormConfig extends React.Component {
               autoComplete="off"
               style={{width: 120}}
               disabled={item.disabled || false}
-              onChange={value => callback(item.key, value)}
+              onChange={value => callback(item.key, value,item.type)}
               { ...item.options }
             /> 
           </Form.Item>,
@@ -125,7 +125,7 @@ class FormConfig extends React.Component {
           >
            <Checkbox.Group
               disabled={item.disabled || false}
-              onChange={value => callback(item.key, value)}
+              onChange={value => callback(item.key, value,item.type,item.list)}
               { ...item.options }
             >
               <Row>
@@ -150,7 +150,7 @@ class FormConfig extends React.Component {
               disabled={item.disabled || false}
               showTime
               format={item.format || 'YYYY-MM-DD HH:mm:ss'}
-              onChange={(value, dateString) => callback(item.key, dateString)}
+              onChange={(value, dateString) => callback(item.key, dateString,item.type)}
               { ...item.options }
             />
           </Form.Item>,
@@ -167,7 +167,7 @@ class FormConfig extends React.Component {
               placeholder={['开始时间', '结束时间']}
               disabled={item.disabled || false}
               format={item.format || 'YYYY-MM-DD'}
-              onChange={(value, dateString) => callback(item.key, dateString)}
+              onChange={(value, dateString) => callback(item.key, dateString,item.type)}
               { ...item.options }
             />
           </Form.Item>

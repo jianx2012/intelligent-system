@@ -1,0 +1,9 @@
+.site-card-wrapper {
+  margin-top: 15px;
+  padding: 30px 40px;
+  background: #ececec;
+}
+.icon-style {
+  display: flex;
+  justify-content: center;
+}

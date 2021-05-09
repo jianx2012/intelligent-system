@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React from 'react';
 import { observer, inject } from 'mobx-react';
 import { withRouter } from 'react-router-dom';
@@ -13,6 +14,7 @@ import { cloneDeep } from "lodash";
 import {
   PlusOutlined,
 } from '@ant-design/icons';
+import storageUtils from "../../utils/storageUtils";
 const { Option } = Select;
 @inject("WorkSpaceDetailMod")
 @withRouter
@@ -31,6 +33,9 @@ class WorkSpaceDetail extends React.Component {
       approvalItem:{},
       tableData:[],
       itemListL:[],
+      searchType:'',
+      searchName:'',
+      tableDataCopy1:[]
     };
   }
 
@@ -39,11 +44,13 @@ class WorkSpaceDetail extends React.Component {
     path = new URLSearchParams(path.substring(1, this.props.location.length))
     const id = path.get('id');
     const result = await Serv.reqworkDetails(id)
+    let userInfo = storageUtils.getUser()
     if (result.status === 0) {
       let { data } = result
       data.formConfig.map((item, index) => {
         item.key = `fileKey_${index}`
         item.dataIndex = `fileKey_${index}`
+        
       })
       let columns = data.formConfig
       
@@ -79,8 +86,9 @@ class WorkSpaceDetail extends React.Component {
           // record.state == 1&&
           return [ record.state == 1?
           <span>
-           <a style={{marginRight:24}} onClick={()=>{this.onApproval(index,3)}}>查看</a>
-           <a style={{marginRight:24}} onClick={()=>{this.onApproval(index,2)}}>编辑</a>
+           {userInfo.role == '管理员'&&<a style={{marginRight:24}} onClick={()=>{this.onApproval(index,3)}}>同意</a>}
+           {userInfo.role == '管理员'&&<a style={{marginRight:24}} onClick={()=>{this.onApproval(index,2)}}>拒绝</a>}
+         <a style={{marginRight:24}} onClick={()=>{this.onShowAdd()}}>编辑</a>
            {/* {this.state.parentId==0?<a onClick={()=>{}}>查看</a>:null} */}
          </span>:<span style={{color:'#3c5b9a'}}>审批完成</span>]
         }
@@ -115,13 +123,14 @@ class WorkSpaceDetail extends React.Component {
         obj.state = item.status
         tableData.push(obj)
       })
-      this.setState({tableData,itemList:data})
+      let tableDataCopy1 = cloneDeep(tableData)
+      this.setState({tableData,itemList:data,tableDataCopy1})
     }
   }
   //修改审批表
-  inputChange(key, value) {
-    console.log('key=>', key, '    value=>>>', value);
-  }
+  // inputChange(key, value,type) {
+  //   console.log('key=>', key, '    value=>>>', value,'type',type);
+  // }
   async onApproval(index,type){
     let itemList = this.state.itemList
     console.log(itemList[index]);
@@ -139,16 +148,38 @@ class WorkSpaceDetail extends React.Component {
   }
   onSearch() {
 
+      let {searchType,searchName,tableData,tableDataCopy1} = this.state
+      if(!searchType){
+        searchType = 'fileKey_0'
+      }
+      tableData = tableDataCopy1.filter(item=>{
+        return item[searchType].indexOf(searchName) != -1
+      })
+
+      this.setState({tableData})
+      console.log(tableData,'tableData');
+
   }
   onReset() {
 
   }
-  inputChange(key, value) {
+  // eslint-disable-next-line no-dupe-class-members
+  inputChange(key, value,type,list) {
     let {approvalItem} = this.state
-    approvalItem[key] = value 
+    if(type == 'RangePicker'){
+      let startTime = value[0]
+      let endTime = value[1]
+      value = startTime + '至' +endTime
+    }
+    if(list){
+      approvalItem[key] = list[value].label
+    }else{
+      approvalItem[key] = value 
+    }
+
     console.log(approvalItem);
     this.setState({approvalItem})
-    console.log(key, '<=key', 'value=>', value);
+    console.log(key, '<=key', 'value=>', value,'type',type,'list',list);
 
     // this.setState({})
   }
@@ -162,6 +193,7 @@ class WorkSpaceDetail extends React.Component {
     const username =  memoryUtils.user.username
     let {approvalItem,data,} = this.state
     let itemlist = []
+    console.log(approvalItem,'approvalItem');
     //把对象转为数组
     for (let i in approvalItem) {
       let o = {};
@@ -200,9 +232,10 @@ class WorkSpaceDetail extends React.Component {
     const title = (
       <span>
         {formList && <Select defaultValue={formList[0].key} style={{ width: 150 }}
-        //  onChange={(value)=>{
-        //     this.setState({searchType:value})
-        // }}
+         onChange={(value)=>{
+           console.log(value,'ssss');
+            this.setState({searchType:value})
+        }}
         >
           {formList.map((item, index) =>
             <Option value={item.key} key={index}>{`按${item.title}搜索`}</Option>
@@ -212,12 +245,13 @@ class WorkSpaceDetail extends React.Component {
         </Select>}
         <Input placeholder='输入关键字搜索' bordered={true} style={{ width: 250, margin: '0 15px' }}
         //    value={searchName}
-        //    onChange={(e)=>{
-        //     this.setState({searchName:e.target.value})
-        // }}
+           onChange={(e)=>{
+            console.log(e.target.value,'ssss');
+            this.setState({searchName:e.target.value})
+        }}
         ></Input>
         <Button type='primary'
-          onClick={() => { this.getProducts(1) }}
+          onClick={() => { this.onSearch() }}
         >搜索</Button>
       </span>
     )

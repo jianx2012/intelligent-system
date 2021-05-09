@@ -50,8 +50,22 @@ class WorkSpaceAdd extends React.Component {
     };
   }
 
-  componentDidMount() {
-
+  async componentDidMount() {
+    let path = this.props.location.search
+    path = new URLSearchParams(path.substring(1, this.props.location.length))
+    const id = path.get('id');
+    if(id){
+      const result = await Serv.reqworkDetails(id)
+      if(result.status == 0){
+        let data = result.data
+        let obj = {desc:data.desc,title:data.title}
+        this.store.setValue('formArray', data.formConfig)
+        this.formRef.current.setFieldsValue({title:data.title,desc:data.desc})
+        this.setState({tableConfig:obj})
+      }
+      this.setState({id})
+    }
+   
   }
 
 
@@ -133,6 +147,7 @@ class WorkSpaceAdd extends React.Component {
 
   //提交
   onSubmit = () => {
+    let id = this.state.id
     const p = this.formRef.current.validateFields()
     p.then(async(value) => {
       let tableConfig = this.state.tableConfig
@@ -143,11 +158,21 @@ class WorkSpaceAdd extends React.Component {
       }else{
         tableConfig.formConfig = formArray
         let detailData = tableConfig
-        const result = await Serv.reqAddwork(detailData)
+        if(id){
+          detailData._id = id
+          const result = await Serv.reqUpdateWork(detailData)
           this.props.history.push('/workspace')
           if(result.status == 0){
             this.store.setValue('formArray',[])
           }
+        }else{
+          const result = await Serv.reqAddwork(detailData)
+          this.props.history.push('/workspace')
+          if(result.status == 0){
+            this.store.setValue('formArray',[])
+          }
+        }
+ 
       }
     }
     )
@@ -215,6 +240,9 @@ class WorkSpaceAdd extends React.Component {
         title: '是否必填',
         dataIndex: 'required',
         key: 'required',
+        render:(record)=>{
+          return <span>{record==1?'是':'否'}</span>
+        }
       },
     ];
     let dataSource = cloneDeep(formArray)

@@ -49,7 +49,7 @@ class Login extends React.Component {
       <div className="login">
         <section className="login_content">
           <div className="login_topPart">
-            <h2>Welcome to NTMBA-System</h2>
+            <h2>Welcome to Na-System</h2>
           </div>
           <div className="login_bottomPart">
             <div className="login_form">

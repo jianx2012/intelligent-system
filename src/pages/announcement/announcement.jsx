@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import React from 'react';
 import { Card, Table, Button, message, Modal } from 'antd';
 import {
@@ -7,12 +8,14 @@ import {
 // import AddForm from "./add_form";
 // import UpdataForm from "./updata_form";
 import Serv from '../../api'
+import storageUtils from "../../utils/storageUtils";
 class Announcement extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             category: '',
             list: '',
+            userInfo:{},
         };
     }
 
@@ -21,11 +24,19 @@ class Announcement extends React.Component {
     }
 
     getList = async () => {
+        let userInfo = storageUtils.getUser()
         this.setState({ loading: true })
         const result = await Serv.reqAnnouncementList()
         this.setState({ loading: false })
         if (result.status == 0) {
             let { list } = result.data
+            if(userInfo.role !=='管理员'){
+                list = list.filter(item=>{
+                    return item.status === 1
+                 
+                })
+              
+            }
             console.log(list, 'list');
             this.setState({ list })
         }
@@ -36,10 +47,12 @@ class Announcement extends React.Component {
     }
     componentDidMount() {
         this.getList()
+      
 
     }
     //初始化table所有列的数组
     onStatus = async (record, type) => {
+        
         //type 1上线 2下架 3删除
         let params = {
             id: record._id
@@ -79,6 +92,7 @@ class Announcement extends React.Component {
     }
     componentWillMount() {
         //  this.initColumns()
+        let userInfo = storageUtils.getUser()
         this.columns = [
             {
                 title: '公告名称',
@@ -105,14 +119,18 @@ class Announcement extends React.Component {
             {
                 title: '操作',
                 fixed: 'right',
-                width: 200,
+                width: 150,
                 render: (record) => (
                     <span>
+                    {userInfo.role=='管理员' && <span>
                         <a style={{ marginRight: 24 }} onClick={() => { this.onAdd(record) }}>编辑</a>
                         <a style={{ marginRight: 24 }} onClick={() => { this.onStatus(record, 1) }}>上线</a>
-                        <a style={{ marginRight: 24 }} onClick={() => { this.onStatus(record, 2) }}>下架</a>
-                        <a style={{ marginRight: 24 }} onClick={() => { this.onStatus(record, 3) }}>删除</a>
+                        {record.status == 1 && <a style={{ marginRight: 24 }} onClick={() => { this.onStatus(record, 2) }}>下架</a>}
+              {record.status == 3 &&<a style={{ marginRight: 24 }} onClick={() => { this.onStatus(record, 3) }}>删除</a>}
+                    </span>}
+                    <span>
                         <a onClick={() => { this.onCheck(record) }}>查看</a>
+                    </span>
                     </span>
                 )
             },
@@ -120,15 +138,18 @@ class Announcement extends React.Component {
     }
 
     render() {
+        let userInfo = storageUtils.getUser()
         const { loading, list, } = this.state
         const extra = (
+       
             <Button type="primary" onClick={() => this.onAdd()}>
                 <PlusOutlined /> 新增
             </Button>
+        
         )
 
         return (<div>
-            <Card title='公告中心' extra={extra} bordered={false}>
+            <Card title='公告中心' extra={userInfo.role=='管理员'?extra:undefined} bordered={false}>
                 <Table bordered dataSource={list} columns={this.columns} rowKey='_id' loading={loading} />
             </Card>
 

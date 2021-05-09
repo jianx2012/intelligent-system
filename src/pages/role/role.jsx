@@ -14,7 +14,7 @@ class Rote extends React.Component {
     if(result.status == 0){
         this.setState({dataSource:result.data})
     }
-    // const result1 = await Serv.reqAddRole()
+    // const result1 = await Serv.reqAddRole('管理员')
     }
     
   render () {

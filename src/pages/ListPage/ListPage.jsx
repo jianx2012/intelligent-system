@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import React from 'react';
 import { Card,Table,Button,Select,Input } from 'antd';
 import {
@@ -7,6 +8,7 @@ import PageTitle from "../../component/PageTitle/PageTitleView";
 import { observer, inject } from 'mobx-react';
 import { withRouter } from 'react-router-dom';
 import Serv from '../../api'
+import storageUtils from "../../utils/storageUtils";
 // import TableDemo from '../../component/Table/TableDemo'
 const { Option } = Select;
 @inject("ListPageMod")
@@ -43,21 +45,22 @@ class ListPage extends React.Component {
   onSearch = async() =>{
     let {searchType,searchName} = this.state
     console.log(searchType,searchName);
-    const result = await Serv.reqSearchWork({pageNum:1,pageSize:10,searchType,searchName})
+    const result = await Serv.reqSearchList({pageNum:1,pageSize:10,searchType,searchName})
     if(result.status == 0){
       let approvallist = result.data.list
       this.setState({approvallist})
     }
   }
     intColumns = () => {
+      let userInfo = storageUtils.getUser()
       this.columns = [
         {
-          title: '审批表',
+          title: '工作列表',
           dataIndex: 'title',
   
         },
         {
-          title: '审批描述',
+          title: '列表描述',
           dataIndex: 'desc',
         },
         {
@@ -66,7 +69,9 @@ class ListPage extends React.Component {
           // dataIndex: 'status',
           render:(record) =>{
             return <span>
-              <a style={{marginRight:10}}>编辑</a> <a onClick={()=>{
+              {userInfo.role=='管理员'&&<a style={{marginRight:10}}
+              onClick={()=>{ this.props.history.push(`/listpage/listpageadd?id=${record._id}`)}}>编辑</a>}
+              <a onClick={()=>{
                  this.props.history.push(`/listpage/listpagedetail?id=${record._id}`)
               }}>查看</a>
             </span>
@@ -83,7 +88,7 @@ class ListPage extends React.Component {
     }
   render () {
     // let {approvallist,pageInfo} = this.store.state
-
+    let userInfo = storageUtils.getUser()
     let {approvallist,searchName,loading} = this.state
     // let title = '审批中心'
     let dataSource = approvallist || []
@@ -115,8 +120,8 @@ class ListPage extends React.Component {
       </span>
     )
     return (<div>
-         <Card title={title} extra={extra} bordered={false}>
-            <PageTitle title='审批中心'></PageTitle>
+         <Card title={title} extra={userInfo.role=='管理员'?extra:undefined} bordered={false}>
+            <PageTitle title='列表中心'></PageTitle>
             <Table dataSource={dataSource} columns={this.columns}  loading={loading} rowKey='_id'/>
          </Card>
     </div>)

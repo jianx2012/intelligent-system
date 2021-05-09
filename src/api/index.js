@@ -1,5 +1,6 @@
 import ajax from './ajax'
 const BASE = ''
+// eslint-disable-next-line import/no-anonymous-default-export
 export default {
     //登录
     reqLogin(username, password) {
@@ -53,7 +54,14 @@ export default {
     reqAddwork(params) {
         return ajax(BASE + '/manage/workspeace/add', { workspeace: params }, 'POST')
     },
-
+    //更新审批表
+    reqUpdateWork( params ) {
+        return ajax(BASE + '/manage/workspeace/update', { ...params }, 'POST')
+    },
+    //更新审批表
+    reqUpdateList(params ) {
+        return ajax(BASE + '/manage/listPage/update', { ...params }, 'POST')
+    },
     // 获取审批中心分页列表
     reqworkList() {
         return ajax(BASE + '/manage/workspeace/list', { pageNum: 1, pageSize: 10 })

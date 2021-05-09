@@ -1,3 +1,4 @@
+/* eslint-disable no-dupe-class-members */
 import React from 'react';
 import { observer, inject } from 'mobx-react';
 import { withRouter } from 'react-router-dom';
@@ -31,6 +32,9 @@ class ListPageDetail extends React.Component {
       approvalItem:{},
       tableData:[],
       itemListL:[],
+      searchType:'',
+      searchName:'',
+      tableDataCopy1:[]
     };
   }
 
@@ -44,6 +48,17 @@ class ListPageDetail extends React.Component {
       data.formConfig.map((item, index) => {
         item.key = `fileKey_${index}`
         item.dataIndex = `fileKey_${index}`
+        // if(item.list){
+        // item.render = (text,record,index)=>{
+        //     let content = ''
+        //     item.list.map(item=>{
+        //       if(item.value == record[`fileKey_${index}`]){
+        //         content = item.label
+        //       }
+        //     })
+        //     return <span>{content}</span>
+        //   }
+        // }
       })
       let columns = data.formConfig
       
@@ -107,13 +122,14 @@ class ListPageDetail extends React.Component {
         obj.state = item.status
         tableData.push(obj)
       })
-      this.setState({tableData,itemList:data})
+      let tableDataCopy1 = cloneDeep(tableData)
+      this.setState({tableData,itemList:data,tableDataCopy1})
     }
   }
   //修改审批表
-  inputChange(key, value) {
-    console.log('key=>', key, '    value=>>>', value);
-  }
+  // inputChange(key, value) {
+  //   console.log('key=>', key, '    value=>>>', value);
+  // }
   async onApproval(index,type){
     let itemList = this.state.itemList
     console.log(itemList[index]);
@@ -131,16 +147,32 @@ class ListPageDetail extends React.Component {
   }
   onSearch() {
 
-  }
+    let {searchType,searchName,tableData,tableDataCopy1} = this.state
+    if(!searchType){
+      searchType = 'fileKey_0'
+    }
+    tableData = tableDataCopy1.filter(item=>{
+      return item[searchType].indexOf(searchName) != -1
+    })
+
+    this.setState({tableData})
+    console.log(tableData,'tableData');
+
+}
   onReset() {
 
   }
-  inputChange(key, value) {
+  inputChange(key, value,type,list) {
     let {approvalItem} = this.state
-    approvalItem[key] = value 
+    if(list){
+      approvalItem[key] = list[value].label
+    }else{
+      approvalItem[key] = value 
+    }
+ 
     console.log(approvalItem);
     this.setState({approvalItem})
-    console.log(key, '<=key', 'value=>', value);
+    console.log(key, '<=key', 'value=>', value,'type',type,'list',list);
 
     // this.setState({})
   }
@@ -192,9 +224,9 @@ class ListPageDetail extends React.Component {
     const title = (
       <span>
         {formList && <Select defaultValue={formList[0].key} style={{ width: 150 }}
-        //  onChange={(value)=>{
-        //     this.setState({searchType:value})
-        // }}
+         onChange={(value)=>{
+            this.setState({searchType:value})
+        }}
         >
           {formList.map((item, index) =>
             <Option value={item.key} key={index}>{`按${item.title}搜索`}</Option>
@@ -203,13 +235,13 @@ class ListPageDetail extends React.Component {
 
         </Select>}
         <Input placeholder='输入关键字搜索' bordered={true} style={{ width: 250, margin: '0 15px' }}
-        //    value={searchName}
-        //    onChange={(e)=>{
-        //     this.setState({searchName:e.target.value})
-        // }}
+    
+           onChange={(e)=>{
+            this.setState({searchName:e.target.value})
+        }}
         ></Input>
         <Button type='primary'
-          onClick={() => { this.getProducts(1) }}
+           onClick={() => { this.onSearch() }}
         >搜索</Button>
       </span>
     )
@@ -221,7 +253,7 @@ class ListPageDetail extends React.Component {
       </Card>
 
       <Drawer
-        title="新增审批"
+        title="新增工作项"
         placement="right"
         width={500}
         closable={false}

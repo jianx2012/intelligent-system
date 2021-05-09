@@ -48,11 +48,26 @@ class ListPageAdd extends React.Component {
       formItem: {},
       optItem: {},
       tableConfig: {},
+      id:undefined
     };
   }
 
-  componentDidMount() {
-
+ async componentDidMount() {
+    let path = this.props.location.search
+    path = new URLSearchParams(path.substring(1, this.props.location.length))
+    const id = path.get('id');
+    if(id){
+      const result = await Serv.reqlistPageDetails(id)
+      if(result.status == 0){
+        let data = result.data
+        let obj = {desc:data.desc,title:data.title}
+        this.store.setValue('formArray', data.formConfig)
+        this.formRef.current.setFieldsValue({title:data.title,desc:data.desc})
+        this.setState({tableConfig:obj})
+      }
+      this.setState({id})
+    }
+   
   }
 
 
@@ -61,7 +76,7 @@ class ListPageAdd extends React.Component {
   inputChange(key, value) {
     let tableConfig = this.state.tableConfig
     tableConfig[key] = value
-    console.log(tableConfig, 'formItem');
+    console.log(tableConfig, 'formItem11');
     this.setState({ tableConfig })
   }
 
@@ -134,6 +149,7 @@ class ListPageAdd extends React.Component {
 
   //提交
   onSubmit = () => {
+    let id = this.state.id
     const p = this.formRef.current.validateFields()
     p.then(async(value) => {
       let tableConfig = this.state.tableConfig
@@ -144,11 +160,21 @@ class ListPageAdd extends React.Component {
       }else{
         tableConfig.formConfig = formArray
         let detailData = tableConfig
-        const result = await Serv.reqAddlistPage(detailData)
+        if(id){
+          detailData._id = id
+          const result = await Serv.reqUpdateList(detailData)
           this.props.history.push('/listpage')
           if(result.status == 0){
             this.store.setValue('formArray',[])
           }
+        }else{
+          const result = await Serv.reqAddlistPage(detailData)
+          this.props.history.push('/listpage')
+          if(result.status == 0){
+            this.store.setValue('formArray',[])
+          }
+        }
+  
       }
     }
     )
@@ -170,8 +196,8 @@ class ListPageAdd extends React.Component {
     const formConfigObj = {
       form: this.formRef,
       formConfig: [
-        { title: '审批表名称', type: 'input', key: 'title', required: true },
-        { title: '审批表描述', type: 'textarea', key: 'desc', required: true },
+        { title: '工作列表名称', type: 'input', key: 'title', required: true },
+        { title: '工作列表描述', type: 'textarea', key: 'desc', required: true },
       ],
       callback: this.inputChange.bind(this)
     }
@@ -221,7 +247,7 @@ class ListPageAdd extends React.Component {
     let dataSource = cloneDeep(formArray)
 
     return (<div>
-      <PageTitle title='审批基本信息' rightContent={  <Button type='primary' onClick={() => { this.onSubmit() }}>发布</Button>}></PageTitle>
+      <PageTitle title='工作表基本信息' rightContent={  <Button type='primary' onClick={() => { this.onSubmit() }}>发布</Button>}></PageTitle>
 
       <Divider />
       <Row>

@@ -16,7 +16,7 @@ import AnnouncementDetail from "../../pages/announcement/announcementDetail";
 import Product from "../../pages/product/product";
 import WorkSpaceHome from "../../pages/WorkSpace/WorkSpaceHome" 
 import ListPageHome from "../../pages/ListPage/ListPageHome" 
-
+import storageUtils from "../../utils/storageUtils";
 import menuList from "../../config/menuConfig";
 import HeaderPart from "../Header/HeaderPart";
 const { Header, Content, Footer, Sider } = Layout;
@@ -26,10 +26,14 @@ class SiderDemo extends React.Component {
   state = {
     collapsed: false,
     path:'/home',
-    optKey:'/'
+    optKey:'/',
+    userInfo:{}
   };
   componentDidMount() {
     let path = this.props.location.pathname
+    let userInfo = storageUtils.getUser()
+    this.setState({userInfo})
+    console.log(userInfo,'storageUtils');
     // let optKey = '/'
     // menuList.map(item=>{
     //     if(item.children){
@@ -52,9 +56,15 @@ class SiderDemo extends React.Component {
   };
 
   render() {
-    const { collapsed } = this.state;
+    const { collapsed ,userInfo} = this.state;
     let path = this.props.location.pathname
     let optKey = '/'
+    if(userInfo.role=='成员'){
+      if(menuList[1].title == '权限'){
+        menuList.splice(1,1)
+      }
+
+    }
     menuList.map(item=>{
         if(item.children){
             item.children.map(cItem=>{
@@ -65,6 +75,7 @@ class SiderDemo extends React.Component {
             })
         }
     })
+    
     // console.log(path,'path');
     console.log(menuList,'menuList');
     return (
@@ -124,7 +135,7 @@ class SiderDemo extends React.Component {
         
 
           </Content>
-          <Footer style={{ textAlign: 'center' }}>NTMBA ©2021 Created by Zheng</Footer>
+          <Footer style={{ textAlign: 'center' }}>NA ©2021 Created by Zheng</Footer>
         </Layout>
       </Layout>
     );
